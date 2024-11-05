@@ -30,7 +30,7 @@ if (MSVC)
         /permissive-
         # /Qspectre
         /utf-8
-        /W3
+        /W4
         /WX-
         /MP     # Enable multi process build.
         /EHsc   # Catch C++ exceptions only, extern C functions never throw a C++ exception.
