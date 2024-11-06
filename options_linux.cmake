@@ -22,6 +22,7 @@ INTERFACE
     -Wno-sign-compare
     -Wno-deprecated # implicit capture of 'this' via '[=]' is deprecated in C++20
     -Wno-error=reorder
+    -Wno-error=unused-function
 )
 
 target_link_options_if_exists(common_options
