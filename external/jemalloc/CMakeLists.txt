@@ -12,8 +12,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 endif()
 
 if (DESKTOP_APP_USE_PACKAGED)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(JEMALLOC jemalloc)
+    find_package(PkgConfig)
+    if (PkgConfig_FOUND)
+        pkg_check_modules(JEMALLOC jemalloc)
+    endif()
 
     if (JEMALLOC_FOUND)
         target_include_directories(external_jemalloc SYSTEM
@@ -23,7 +25,7 @@ if (DESKTOP_APP_USE_PACKAGED)
 
         target_link_libraries(external_jemalloc
         INTERFACE
-            -Wl,--push-state,--no-as-needed,${JEMALLOC_LINK_LIBRARIES},--pop-state
+            -Wl,--push-state,--no-as-needed,--whole-archive,${JEMALLOC_LINK_LIBRARIES},--pop-state
         )
 
         return()

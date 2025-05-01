@@ -7,6 +7,18 @@
 add_library(external_cld3 INTERFACE IMPORTED GLOBAL)
 add_library(desktop-app::external_cld3 ALIAS external_cld3)
 
+if (DESKTOP_APP_USE_PACKAGED)
+    find_package(protobuf CONFIG)
+    find_library(DESKTOP_APP_CLD3_LIBRARIES NAMES cld3)
+    find_path(DESKTOP_APP_CLD3_INCLUDE_DIRS NAMES nnet_language_identifier.h PATH_SUFFIXES cld3)
+    if (protobuf_FOUND AND DESKTOP_APP_CLD3_LIBRARIES AND DESKTOP_APP_CLD3_INCLUDE_DIRS)
+        list(APPEND DESKTOP_APP_CLD3_LIBRARIES protobuf::libprotobuf-lite)
+        target_include_directories(external_cld3 SYSTEM INTERFACE ${DESKTOP_APP_CLD3_INCLUDE_DIRS})
+        target_link_libraries(external_cld3 INTERFACE ${DESKTOP_APP_CLD3_LIBRARIES})
+        return()
+    endif()
+endif()
+
 add_library(external_cld3_bundled STATIC)
 init_target(external_cld3_bundled "(external)")
 
@@ -17,10 +29,7 @@ set(gen_loc ${CMAKE_CURRENT_BINARY_DIR}/gen)
 set(gen_dst ${gen_loc}/cld_3/protos)
 
 if (DESKTOP_APP_USE_PACKAGED OR LINUX)
-    find_package(protobuf CONFIG)
-    if (NOT protobuf_FOUND)
-        find_package(Protobuf MODULE REQUIRED)
-    endif()
+    find_package(protobuf REQUIRED CONFIG)
     set(protoc_executable protobuf::protoc)
     set(protobuf_lib protobuf::libprotobuf-lite)
 elseif (WIN32)
@@ -109,7 +118,7 @@ if (NOT DESKTOP_APP_USE_PACKAGED AND NOT LINUX)
 endif()
 
 target_link_libraries(external_cld3_bundled
-PRIVATE
+PUBLIC
     ${protobuf_lib}
 )
 

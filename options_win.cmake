@@ -51,6 +51,8 @@ if (MSVC)
         /wd4459 # declaration of 'identifier' hides global declaration
         /wd4611 # interaction between 'function' and C++ object destruction is non-portable
         /wd4702 # unreachable code
+        /wd4310 # cast truncates constant value
+        /wd4127 # conditional expression is constant
         /Zi
 
         # Taken from Qt 6.
@@ -65,6 +67,7 @@ if (MSVC)
         $<IF:$<CONFIG:Debug>,/NODEFAULTLIB:LIBCMT,/DEBUG;/OPT:REF>
         $<$<BOOL:${DESKTOP_APP_NO_PDB}>:/DEBUG:NONE>
         /INCREMENTAL:NO
+        /DEPENDENTLOADFLAG:0x800
     )
 
     if (DESKTOP_APP_ASAN)
@@ -103,30 +106,6 @@ if (MSVC)
         INTERFACE
             $<IF:$<CONFIG:Debug>,,/LTCG>
             $<IF:$<CONFIG:Debug>,,/LTCGOUT:>
-        )
-    endif()
-else()
-    target_compile_definitions(common_options
-    INTERFACE
-        WINVER=0x0601
-        _WIN32_WINNT=0x0601
-    )
-
-    target_compile_options(common_options
-    INTERFACE
-        -fpermissive
-    )
-
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(common_options
-        INTERFACE
-            -fms-extensions
-            -femulated-tls
-        )
-
-        target_link_options(common_options
-        INTERFACE
-            -fuse-ld=lld
         )
     endif()
 endif()
