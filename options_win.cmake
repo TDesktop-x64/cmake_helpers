@@ -53,7 +53,6 @@ if (MSVC)
         /wd4702 # unreachable code
         /wd4310 # cast truncates constant value
         /wd4127 # conditional expression is constant
-        /Zi
 
         # Taken from Qt 6.
         # https://developercommunity.visualstudio.com/content/problem/139261/msvc-incorrectly-defines-cplusplus.html
@@ -64,8 +63,9 @@ if (MSVC)
 
     target_link_options(common_options
     INTERFACE
-        $<IF:$<CONFIG:Debug>,/NODEFAULTLIB:LIBCMT,/DEBUG;/OPT:REF>
-        $<$<BOOL:${DESKTOP_APP_NO_PDB}>:/DEBUG:NONE>
+        $<$<CONFIG:Debug>:/NODEFAULTLIB:LIBCMT>
+        $<IF:$<STREQUAL:$<GENEX_EVAL:$<TARGET_PROPERTY:MSVC_DEBUG_INFORMATION_FORMAT>>,ProgramDatabase>,/DEBUG,/DEBUG:NONE>
+        $<$<NOT:$<CONFIG:Debug>>:/OPT:REF>
         /INCREMENTAL:NO
     )
 
@@ -99,12 +99,12 @@ if (MSVC)
         target_compile_options(common_options
         INTERFACE
             /WX
-            $<IF:$<CONFIG:Debug>,,/GL>
+            $<$<NOT:$<CONFIG:Debug>>:/GL>
         )
         target_link_options(common_options
         INTERFACE
-            $<IF:$<CONFIG:Debug>,,/LTCG>
-            $<IF:$<CONFIG:Debug>,,/LTCGOUT:>
+            $<$<NOT:$<CONFIG:Debug>>:/LTCG>
+            $<$<NOT:$<CONFIG:Debug>>:/LTCGOUT:>
         )
     endif()
 endif()
