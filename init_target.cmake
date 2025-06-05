@@ -23,22 +23,22 @@ function(init_target target_name) # init_target(my_target [cxx_std_..] folder_na
     endforeach()
     target_compile_features(${target_name} PRIVATE ${standard})
     target_link_libraries(${target_name} PRIVATE desktop-app::common_options)
+    set_target_properties(${target_name} PROPERTIES
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_WEAK YES
+    )
     if (DESKTOP_APP_USE_PACKAGED)
         get_target_property(target_type ${target_name} TYPE)
-        if (QT_FOUND AND LINUX AND target_type STREQUAL "EXECUTABLE")
-            qt_import_plugins(${target_name}
-            INCLUDE
-                Qt::QGtk3ThemePlugin
-                Qt::QComposePlatformInputContextPlugin
-                Qt::QIbusPlatformInputContextPlugin
-                Qt::QXdgDesktopPortalThemePlugin
-                Qt::QWaylandIntegrationPlugin
-                Qt::QWaylandEglPlatformIntegrationPlugin
-                Qt::QWaylandEglClientBufferPlugin
-                Qt::QWaylandXdgShellIntegrationPlugin
-                Qt::QWaylandAdwaitaDecorationPlugin
-                Qt::QWaylandBradientDecorationPlugin
-            )
+        if (QT_FOUND AND target_type STREQUAL "EXECUTABLE")
+            cmake_language(EVAL CODE "cmake_language(DEFER CALL qt_finalize_target ${target_name})")
+            if (LINUX)
+                qt_import_plugins(${target_name}
+                INCLUDE
+                    Qt::QGtk3ThemePlugin
+                    Qt::QComposePlatformInputContextPlugin
+                    Qt::QIbusPlatformInputContextPlugin
+                    Qt::QXdgDesktopPortalThemePlugin
+                )
+            endif()
         endif()
     else()
         set_target_properties(${target_name} PROPERTIES

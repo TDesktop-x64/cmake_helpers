@@ -28,7 +28,9 @@ INTERFACE
 target_link_options_if_exists(common_options
 INTERFACE
     -Wno-alloc-size-larger-than # Qt + LTO
+    -Wno-free-nonheap-object # Qt + LTO
     -Wno-stringop-overflow # Qt + LTO
+    -Wno-stringop-overread # Qt + LTO
     -Wno-odr # Qt + LTO
     -Wno-inline # OpenAL + LTO
     -pthread
@@ -39,35 +41,6 @@ if (DESKTOP_APP_SPECIAL_TARGET)
     target_compile_options(common_options
     INTERFACE
         -Werror
-    )
-endif()
-
-if (NOT DESKTOP_APP_USE_PACKAGED)
-    set(ipo_prop $<TARGET_PROPERTY:INTERPROCEDURAL_OPTIMIZATION>)
-    set(ipo_config_prop $<TARGET_PROPERTY:INTERPROCEDURAL_OPTIMIZATION_$<UPPER_CASE:$<CONFIG>>>)
-    set(ipo_compile_value_on)
-    set(ipo_compile_value_off -fno-lto)
-    set(ipo_compile_values ${ipo_compile_value_on},${ipo_compile_value_off})
-    set(ipo_link_value_on -fwhole-program)
-    set(ipo_link_value_off -fuse-ld=lld -fno-lto -fno-use-linker-plugin)
-    set(ipo_link_values ${ipo_link_value_on},${ipo_link_value_off})
-    target_compile_options(common_options
-    INTERFACE
-        $<IF:$<NOT:$<STREQUAL:${ipo_config_prop},>>,$<IF:$<BOOL:${ipo_config_prop}>,${ipo_compile_values}>,$<IF:$<BOOL:${ipo_prop}>,${ipo_compile_values}>>
-        $<$<CONFIG:Debug>:-O0>
-        $<$<CONFIG:Debug>:-U_FORTIFY_SOURCE>
-    )
-    target_link_options(common_options
-    INTERFACE
-        $<IF:$<NOT:$<STREQUAL:${ipo_config_prop},>>,$<IF:$<BOOL:${ipo_config_prop}>,${ipo_link_values}>,$<IF:$<BOOL:${ipo_prop}>,${ipo_link_values}>>
-        -static-libstdc++
-        -static-libgcc
-        -rdynamic
-        -Wl,-z,muldefs
-        -Wl,-z,relro
-        -Wl,-z,now
-        -Wl,-z,noexecstack
-        -pie
     )
 endif()
 
@@ -105,14 +78,6 @@ endif()
 if (DESKTOP_APP_ASAN)
     target_compile_options(common_options INTERFACE -fsanitize=address)
     target_link_options(common_options INTERFACE -fsanitize=address)
-
-    if (NOT DESKTOP_APP_USE_PACKAGED)
-        if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            target_link_options(common_options INTERFACE -static-libasan)
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-            target_link_options(common_options INTERFACE -static-libsan)
-        endif()
-    endif()
 endif()
 
 target_link_libraries(common_options

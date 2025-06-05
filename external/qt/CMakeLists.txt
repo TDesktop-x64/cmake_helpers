@@ -16,17 +16,35 @@ if (DESKTOP_APP_USE_PACKAGED)
         Qt::CorePrivate
         Qt::Gui
         Qt::GuiPrivate
-        $<TARGET_NAME_IF_EXISTS:Qt::OpenGL>
         Qt::Widgets
         Qt::WidgetsPrivate
-        $<TARGET_NAME_IF_EXISTS:Qt::OpenGLWidgets>
         Qt::Network
         Qt::Svg
-        $<TARGET_NAME_IF_EXISTS:Qt::DBus>
-        $<TARGET_NAME_IF_EXISTS:Qt::Quick>
-        $<TARGET_NAME_IF_EXISTS:Qt::QuickWidgets>
-        $<TARGET_NAME_IF_EXISTS:Qt::WaylandCompositor>
     )
+
+    if (TARGET Qt::OpenGL)
+        target_link_libraries(external_qt INTERFACE Qt::OpenGL)
+    endif()
+
+    if (TARGET Qt::OpenGLWidgets)
+        target_link_libraries(external_qt INTERFACE Qt::OpenGLWidgets)
+    endif()
+
+    if (TARGET Qt::DBus)
+        target_link_libraries(external_qt INTERFACE Qt::DBus)
+    endif()
+
+    if (TARGET Qt::Quick)
+        target_link_libraries(external_qt INTERFACE Qt::Quick)
+    endif()
+
+    if (TARGET Qt::QuickWidgets)
+        target_link_libraries(external_qt INTERFACE Qt::QuickWidgets)
+    endif()
+
+    if (TARGET Qt::WaylandCompositor)
+        target_link_libraries(external_qt INTERFACE Qt::WaylandCompositor)
+    endif()
 
     return()
 endif()
@@ -229,6 +247,14 @@ elseif (APPLE)
     endforeach()
 else()
     set(qt_libs
+        plugins/platforms/${qt_lib_prefix}qwayland-generic
+        plugins/platforms/${qt_lib_prefix}qwayland-egl
+        plugins/wayland-graphics-integration-client/${qt_lib_prefix}qt-plugin-wayland-egl
+        plugins/wayland-shell-integration/${qt_lib_prefix}xdg-shell
+        plugins/wayland-decoration-client/${qt_lib_prefix}adwaita
+        plugins/wayland-decoration-client/${qt_lib_prefix}bradient
+        lib/${qt_lib_prefix}Qt${QT_VERSION_MAJOR}WaylandEglClientHwIntegration
+        lib/${qt_lib_prefix}Qt${QT_VERSION_MAJOR}WaylandClient
         plugins/platforms/${qt_lib_prefix}qxcb
         plugins/xcbglintegrations/${qt_lib_prefix}qxcb-egl-integration
         plugins/xcbglintegrations/${qt_lib_prefix}qxcb-glx-integration
@@ -244,6 +270,12 @@ else()
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QXcbIntegrationPlugin_init>
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QXcbEglIntegrationPlugin_init>
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QXcbGlxIntegrationPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandIntegrationPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandEglPlatformIntegrationPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandEglClientBufferPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandXdgShellIntegrationPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandAdwaitaDecorationPlugin_init>
+        $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandBradientDecorationPlugin_init>
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QComposePlatformInputContextPlugin_init>
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QSvgIconPlugin_init>
         $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QGtk3ThemePlugin_init>
@@ -262,26 +294,6 @@ else()
         list(APPEND qt_libs_list
             $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QIbusPlatformInputContextPlugin_init>
             $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QXdgDesktopPortalThemePlugin_init>
-        )
-    endif()
-    if (TARGET Qt::WaylandClient)
-        list(PREPEND qt_libs
-            plugins/platforms/${qt_lib_prefix}qwayland-generic
-            plugins/platforms/${qt_lib_prefix}qwayland-egl
-            plugins/wayland-graphics-integration-client/${qt_lib_prefix}qt-plugin-wayland-egl
-            plugins/wayland-shell-integration/${qt_lib_prefix}xdg-shell
-            plugins/wayland-decoration-client/${qt_lib_prefix}adwaita
-            plugins/wayland-decoration-client/${qt_lib_prefix}bradient
-            lib/${qt_lib_prefix}Qt${QT_VERSION_MAJOR}WaylandEglClientHwIntegration
-            lib/${qt_lib_prefix}Qt${QT_VERSION_MAJOR}WaylandClient
-        )
-        list(APPEND qt_libs_list
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandIntegrationPlugin_init>
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandEglPlatformIntegrationPlugin_init>
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandEglClientBufferPlugin_init>
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandXdgShellIntegrationPlugin_init>
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandAdwaitaDecorationPlugin_init>
-            $<TARGET_OBJECTS:Qt${QT_VERSION_MAJOR}::QWaylandBradientDecorationPlugin_init>
         )
     endif()
     if (TARGET Qt::WaylandCompositor)
@@ -364,9 +376,22 @@ elseif (APPLE)
     INTERFACE
         ${qt_loc}/mkspecs/linux-g++
     )
-    target_link_static_libraries(external_qt
+    target_link_libraries(external_qt
     INTERFACE
+        gtk-3
+        gdk-3
+        gdk_pixbuf-2.0
+        pango-1.0
         lcms2
+        fontconfig
+        freetype
+        EGL
+        GL
+        wayland-egl
+        wayland-cursor
+        wayland-client
+        X11-xcb
+        X11
         xkbcommon
         xkbcommon-x11
         xcb-cursor
@@ -383,44 +408,20 @@ elseif (APPLE)
         xcb-util
         xcb-render-util
         xcb-keysyms
+        xcb
+        gio-2.0
+        gobject-2.0
+        glib-2.0
+        rt
         webpmux
         webpdemux
         webp
         sharpyuv
     )
-    if (TARGET Qt::WaylandClient)
-        target_link_optional_libraries(external_qt
-        INTERFACE
-            wayland-egl
-            wayland-cursor
-            wayland-client
-        )
-    endif()
     if (TARGET Qt::WaylandCompositor)
-        target_link_optional_libraries(external_qt
+        target_link_libraries(external_qt
         INTERFACE
             wayland-server
         )
     endif()
-    target_link_optional_libraries(external_qt
-    INTERFACE
-        gtk-3
-        gdk-3
-        gdk_pixbuf-2.0
-        pango-1.0
-        EGL
-        GL
-        X11-xcb
-        xcb
-    )
-    target_link_libraries(external_qt
-    INTERFACE
-        fontconfig
-        freetype
-        X11
-        gio-2.0
-        gobject-2.0
-        glib-2.0
-        rt
-    )
 endif()
