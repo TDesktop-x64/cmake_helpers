@@ -33,18 +33,34 @@ PRIVATE
 )
 
 if (DESKTOP_APP_USE_PACKAGED OR LINUX)
-    find_package(libavif REQUIRED)
-    find_package(libheif REQUIRED)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(DESKTOP_APP_JXL REQUIRED IMPORTED_TARGET libjxl)
-    pkg_check_modules(DESKTOP_APP_JXL_THREADS REQUIRED IMPORTED_TARGET libjxl_threads)
+    find_package(libavif QUIET)
+    find_package(libheif QUIET)
+    find_package(PkgConfig)
+    if (PkgConfig_FOUND)
+        if (NOT libavif_FOUND)
+            pkg_check_modules(DESKTOP_APP_AVIF IMPORTED_TARGET libavif)
+        endif()
+        pkg_check_modules(DESKTOP_APP_JXL IMPORTED_TARGET libjxl libjxl_threads)
+    endif()
+
+    if (NOT libavif_FOUND AND NOT DESKTOP_APP_AVIF_FOUND)
+        remove_target_sources(external_qt_static_plugins_kimageformats ${kimageformats_src} avif.cpp)
+    endif()
+
+    if (NOT libheif_FOUND)
+        remove_target_sources(external_qt_static_plugins_kimageformats ${kimageformats_src} heif.cpp)
+    endif()
+
+    if (NOT DESKTOP_APP_JXL_FOUND)
+        remove_target_sources(external_qt_static_plugins_kimageformats ${kimageformats_src} jxl.cpp)
+    endif()
 
     target_link_libraries(external_qt_static_plugins_kimageformats
     PRIVATE
-        avif
-        heif
-        PkgConfig::DESKTOP_APP_JXL
-        PkgConfig::DESKTOP_APP_JXL_THREADS
+        $<TARGET_NAME_IF_EXISTS:avif>
+        $<TARGET_NAME_IF_EXISTS:PkgConfig::DESKTOP_APP_AVIF>
+        $<TARGET_NAME_IF_EXISTS:heif>
+        $<TARGET_NAME_IF_EXISTS:PkgConfig::DESKTOP_APP_JXL>
     )
 elseif (WIN32)
     target_compile_definitions(external_qt_static_plugins_kimageformats
