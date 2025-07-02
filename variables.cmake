@@ -22,6 +22,7 @@ endif()
 
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF CACHE BOOL "")
 set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase" CACHE STRING "")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 option(DESKTOP_APP_TEST_APPS "Build test apps, development only." OFF)
 option(DESKTOP_APP_LOTTIE_DISABLE_RECOLORING "Disable recoloring of lottie animations." OFF)
 option(DESKTOP_APP_LOTTIE_USE_CACHE "Use caching in lottie animations." ON)
@@ -36,7 +37,6 @@ option(DESKTOP_APP_USE_HUNSPELL_ONLY "Disable system spellchecker and use bundle
 option(DESKTOP_APP_ASAN "Enable address sanitizer" OFF)
 cmake_dependent_option(DESKTOP_APP_USE_ENCHANT "Use Enchant instead of bundled Hunspell." OFF LINUX OFF)
 cmake_dependent_option(DESKTOP_APP_USE_CLD3 "Disable system text language recognition and use bundled cld3 only." OFF APPLE ON)
-cmake_dependent_option(DESKTOP_APP_DISABLE_JEMALLOC "Disable jemalloc, use system malloc." OFF "LINUX; NOT DESKTOP_APP_ASAN" ON)
 
 if (APPLE)
     set(DESKTOP_APP_MAC_ARCH "" CACHE STRING "Target macOS arch.")
