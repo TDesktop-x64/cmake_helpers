@@ -31,7 +31,6 @@ if (MSVC)
         # /Qspectre
         /utf-8
         /W4
-        /WX-
         /MP     # Enable multi process build.
         /EHsc   # Catch C++ exceptions only, extern C functions never throw a C++ exception.
         /w15038 # wrong initialization order
