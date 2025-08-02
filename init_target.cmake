@@ -44,14 +44,15 @@ function(init_target target_name) # init_target(my_target [cxx_std_..] folder_na
         endif()
     endif()
     if (DESKTOP_APP_SPECIAL_TARGET)
-        if (MSVC)
-            set_property(TARGET ${target_name} APPEND_STRING PROPERTY STATIC_LIBRARY_OPTIONS "$<$<NOT:$<CONFIG:Debug>>:/LTCG>")
-        elseif (APPLE)
-            set_target_properties(${target_name} PROPERTIES
-                XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<IF:$<CONFIG:Debug>,0,fast>
-                XCODE_ATTRIBUTE_LLVM_LTO $<IF:$<CONFIG:Debug>,NO,YES>
-            )
-        else()
+#        if (MSVC)
+#            set_property(TARGET ${target_name} APPEND_STRING PROPERTY STATIC_LIBRARY_OPTIONS "$<$<NOT:$<CONFIG:Debug>>:/LTCG>")
+#        elseif (APPLE)
+#            set_target_properties(${target_name} PROPERTIES
+#                XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL $<IF:$<CONFIG:Debug>,0,fast>
+#                XCODE_ATTRIBUTE_LLVM_LTO $<IF:$<CONFIG:Debug>,NO,YES>
+#            )
+#        else()
+        if (LINUX)
             set_target_properties(${target_name} PROPERTIES
                 INTERPROCEDURAL_OPTIMIZATION_RELEASE True
                 INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO True

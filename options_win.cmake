@@ -99,13 +99,13 @@ if (MSVC)
         target_compile_options(common_options
         INTERFACE
             /WX
-            $<$<NOT:$<CONFIG:Debug>>:/GL>
+            $<$<NOT:$<CONFIG:Debug>>:/GL->
         )
-        target_link_options(common_options
-        INTERFACE
-            $<$<NOT:$<CONFIG:Debug>>:/LTCG>
-            $<$<NOT:$<CONFIG:Debug>>:/LTCGOUT:>
-        )
+#        target_link_options(common_options
+#        INTERFACE
+#            $<$<NOT:$<CONFIG:Debug>>:/LTCG>
+#            $<$<NOT:$<CONFIG:Debug>>:/LTCGOUT:>
+#        )
     endif()
 endif()
 
