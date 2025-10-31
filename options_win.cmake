@@ -116,6 +116,7 @@ INTERFACE
     kernel32
     user32
     gdi32
+    ntdll
     winspool
     comdlg32
     advapi32
