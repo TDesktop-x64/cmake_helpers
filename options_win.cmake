@@ -49,6 +49,7 @@ if (MSVC)
         /wd4458 # declaration of 'identifier' hides class member
         /wd4459 # declaration of 'identifier' hides global declaration
         /wd4611 # interaction between 'function' and C++ object destruction is non-portable
+        /wd4714 # function marked as __forceinline not inlined
         /wd4702 # unreachable code
         /wd4310 # cast truncates constant value
         /wd4127 # conditional expression is constant
@@ -63,7 +64,8 @@ if (MSVC)
     target_link_options(common_options
     INTERFACE
         $<$<CONFIG:Debug>:/NODEFAULTLIB:LIBCMT>
-        $<IF:$<STREQUAL:$<GENEX_EVAL:$<TARGET_PROPERTY:MSVC_DEBUG_INFORMATION_FORMAT>>,ProgramDatabase>,/DEBUG,/DEBUG:NONE>
+        $<$<AND:$<CONFIG:Debug>,$<OR:$<BOOL:${build_win64}>,$<BOOL:${build_winarm}>>>:/DEBUG:NONE>
+        $<$<NOT:$<AND:$<CONFIG:Debug>,$<OR:$<BOOL:${build_win64}>,$<BOOL:${build_winarm}>>>>:$<IF:$<BOOL:$<GENEX_EVAL:$<TARGET_PROPERTY:MSVC_DEBUG_INFORMATION_FORMAT>>>,/DEBUG,/DEBUG:NONE>>
         $<$<NOT:$<CONFIG:Debug>>:/OPT:REF>
         /INCREMENTAL:NO
     )
