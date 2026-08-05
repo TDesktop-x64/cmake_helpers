@@ -97,8 +97,17 @@ PRIVATE
     ${microtex_src}/platform/qt/graphic_qt.cpp
 )
 
-target_include_directories(external_microtex_bundled SYSTEM
-PUBLIC
+# Not SYSTEM for the producer's own sources or its layout-coupled consumer:
+# clang's -MMD leaves system headers out of generated dependency files. Keeping
+# both include paths ordinary makes MicroTeX and td_iv objects track header
+# changes instead of retaining objects compiled against older class layouts.
+target_include_directories(external_microtex_bundled
+PRIVATE
+    ${microtex_src}
+)
+
+target_include_directories(external_microtex_bundled
+INTERFACE
     ${microtex_src}
 )
 
