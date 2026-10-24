@@ -139,6 +139,7 @@ INTERFACE
     Dwmapi
     UxTheme
     Wtsapi32
+    Comctl32
     Crypt32
     Propsys
     Bcrypt
