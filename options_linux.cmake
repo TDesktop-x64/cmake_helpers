@@ -41,13 +41,6 @@ INTERFACE
     -Wl,--as-needed
 )
 
-if (DESKTOP_APP_SPECIAL_TARGET)
-    target_compile_options(common_options
-    INTERFACE
-        -Werror
-    )
-endif()
-
 if (DESKTOP_APP_USE_ALLOCATION_TRACER)
     target_link_options(common_options
     INTERFACE

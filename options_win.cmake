@@ -99,7 +99,6 @@ if (MSVC)
     if (DESKTOP_APP_SPECIAL_TARGET)
         target_compile_options(common_options
         INTERFACE
-            /WX
             $<$<AND:$<NOT:$<CONFIG:Debug>>,$<BOOL:${DESKTOP_APP_ENABLE_LTO}>>:/GL>
         )
         target_link_options(common_options

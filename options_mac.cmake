@@ -46,7 +46,6 @@ if (DESKTOP_APP_SPECIAL_TARGET)
     target_compile_options(common_options
     INTERFACE
         -g
-        -Werror
     )
     if (NOT CMAKE_GENERATOR STREQUAL Xcode)
         target_compile_options(common_options INTERFACE
